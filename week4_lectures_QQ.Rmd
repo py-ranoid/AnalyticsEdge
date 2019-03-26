@@ -1,0 +1,286 @@
+---
+title: "Week 4 - Lectures & Quick Questions"
+author: "Vishal Gupta"
+date: "3/23/2019"
+fig_width: 5 
+fig_height: 4 
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=5, fig.height=3,fig.align = "center")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE}
+library(dplyr)
+library(rpart)
+library(rpart.plot)
+library(caTools)
+library(ROCR)
+library(randomForest)
+library(tm)
+library(SnowballC)
+```
+## Judge, Jury, and Classifier: An Introduction to Trees  
+
+#### Video 4: CART in R
+
+Loading the data
+
+```{r}
+stevens = read.csv("~/Downloads/stevens.csv")
+str(stevens)
+```
+
+Splitting the data into Test and Train
+```{r}
+library(caTools)
+set.seed(3000)
+spl = sample.split(stevens$Reverse, SplitRatio = 0.7)
+Train = stevens[spl==T,]
+Test = stevens[spl==F,]
+```
+
+Installing 
+- `rpart` : Recursive Partitioning and Regression Trees
+- `rpart.plot` : Plot an rpart model. A simplified interface to the prp function
+```{r}
+#install.packages("rpart")
+library(rpart)
+#install.packages("rpart.plot")
+library(rpart.plot)
+```
+
+Training a CART model to predict if Supreme Court will "Reverse" the decision
+```{r}
+StevensTree = rpart(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst, data = Train, method="class", minbucket=25)
+```
+
+Plotting `StevensTree`
+```{r}
+prp(StevensTree)
+```
+
+Predict reversal of cases in test set
+```{r}
+PredictCART = predict(StevensTree, newdata = Test, type = "class")
+table(Test$Reverse, PredictCART)
+```
+
+Plotting ROC Curve
+Note : 
+- If `type="class"` is not specified, then `predict` returns probabilities of both classes.
+- `PredictROC[,2]` gives probability of output being `1`
+```{r}
+library(ROCR)
+PredictROC = predict(StevensTree, newdata = Test)
+head(PredictROC)
+pred = prediction(PredictROC[,2], Test$Reverse)
+perf = performance(pred, "tpr", "fpr")
+plot(perf)
+```
+
+#### Quick Question
+
+**Compute the AUC of the CART model from the previous video**
+```{r}
+as.numeric(performance(pred, "auc")@y.values)
+```
+
+Now, recall that in Video 4, our tree had 7 splits. 
+**Let's see how this changes if we change the value of minbucket.**
+
+First **build a CART model that is similar to the one we built in Video 4, except change the minbucket parameter to 5.** Plot the tree.
+
+**How many splits does the tree have?**
+```{r} 
+stevensTree5 = rpart(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst,data = Train ,method = "class",minbucket=5)
+prp(stevensTree5)
+```
+
+Now build a CART model that is similar to the one we built in Video 4, except **change the minbucket parameter to 100**. Plot the tree.
+
+**How many splits does the tree have?**
+
+```{r} 
+stevensTree100 = rpart(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst,data = Train ,method = "class",minbucket=100)
+prp(stevensTree100)
+```
+
+#### Video 5: Random Forests
+
+Install packages
+
+- randomForest : Classification and Regression with Random Forest
+```{r}
+#install.packages("randomForest")
+library(randomForest)
+```
+
+Encode `Reverse` as a factor
+```{r}
+Train$Reverse = as.factor(Train$Reverse)
+Test$Reverse = as.factor(Test$Reverse)
+```
+
+Training a Random Forest model to predict reversal
+```{r}
+StevensForest = randomForest(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst, data = Train, ntree=200, nodesize=25)
+```
+
+Predict outcomes of cases in test set using `StevensForest`
+```{r}
+PredictForest = predict(StevensForest, newdata = Test)
+table(Test$Reverse, PredictForest)
+```
+
+#### Quick Question
+When creating random forest models, you might still get different answers from the ones you see here even if you set the random seed. This has to do with different operating systems and the random forest implementation.
+
+**Let's see what happens if we set the seed to two different values and create two different random forest models.**
+
+First, **set the seed to 100**, and the re-build the random forest model, exactly like we did in the previous video (Video 5). Then make predictions on the test set. **What is the accuracy of the model on the test set?**
+
+
+```{r}
+set.seed(100)
+spl = sample.split(stevens$Reverse,SplitRatio = 0.7)
+Train = stevens[spl==T,]
+Test = stevens[spl==F,]
+Test$Reverse = as.factor(Test$Reverse)
+Train$Reverse = as.factor(Train$Reverse)
+stevensForest = randomForest(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst,data = Train,nodesize=25,ntree=200)
+pred = predict(stevensForest,Test)
+sum(pred==Test$Reverse)/length(Test$Reverse)
+```
+
+Now, **set the seed to 200**, and then re-build the random forest model, exactly like we did in the previous video (Video 5). Then make predictions on the test set. **What is the accuracy of this model on the test set?**
+
+
+```{r}
+set.seed(200)
+spl = sample.split(stevens$Reverse,SplitRatio = 0.7)
+Train = stevens[spl==T,]
+Test = stevens[spl==F,]
+Test$Reverse = as.factor(Test$Reverse)
+Train$Reverse = as.factor(Train$Reverse)
+stevensForest = randomForest(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst,data = Train,nodesize=25,ntree=200)
+pred = predict(stevensForest,Test)
+sum(pred==Test$Reverse)/length(Test$Reverse)
+```
+
+#### Video 7: Cross-Validation
+
+Install packages
+```{r}
+#install.packages("caret")
+library(caret)
+#install.packages("e1071")
+library(e1071)
+```
+
+Define No. of Folds for Cross-Validation and grid space to iterate over.
+```{r}
+numFolds = trainControl( method = "cv", number = 10 )
+cpGrid = expand.grid( .cp = seq(0.01,0.5,0.01)) 
+```
+
+Perform Cross-Validation for `numFolds` folds over `cpGrid` on `rpart`
+```{r}
+train(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst, data = Train, method = "rpart", trControl = numFolds, tuneGrid = cpGrid )
+```
+
+Create a CART model with `cp = 0.18`
+```{r}
+StevensTreeCV = rpart(Reverse ~ Circuit + Issue + Petitioner + Respondent + LowerCourt + Unconst, data = Train, method="class", cp = 0.18)
+```
+
+Predict outcomes of test cases
+```{r}
+PredictCV = predict(StevensTreeCV, newdata = Test, type = "class")
+sum(Test$Reverse==PredictCV)/length(PredictCV)
+```
+
+#### Quick Question
+**Plot the tree that we created using cross-validation. How many splits does it have?**
+```{r}
+prp(StevensTreeCV)
+```
+
+## Keeping an Eye on Healthcare Costs: The D2Hawkeye Story
+
+Loading the data
+```{r}
+Claims = read.csv("~/Downloads/ClaimsData.csv")
+str(Claims)
+```
+
+Percentage of patients in each cost bucket
+```{r}
+table(Claims$bucket2009)/nrow(Claims)
+```
+
+
+Split the data into Train and Test
+```{r}
+library(caTools)
+set.seed(88)
+spl = sample.split(Claims$bucket2009, SplitRatio = 0.6)
+ClaimsTrain = Claims[spl==T,]
+ClaimsTest = Claims[spl==F,]
+```
+
+#### Quick Question
+
+What is the average age of patients in the training set, ClaimsTrain?
+```{r}
+mean(ClaimsTrain$age)
+```
+
+What proportion of people in the training set (ClaimsTrain) had at least one diagnosis code for diabetes?
+```{r}
+sum(ClaimsTrain$diabetes)/nrow(ClaimsTrain)
+```
+
+
+
+#### Video 7: Baseline Method and Penalty Matrix
+
+Baseline Model Accuracy
+```{r}
+table(ClaimsTest$bucket2009,ClaimsTest$bucket2008)
+sum(ClaimsTest$bucket2009==ClaimsTest$bucket2008)/nrow(ClaimsTest)
+```
+
+Creating Penalty Matrix
+```{r}
+PenaltyMatrix = matrix(c(0,1,2,3,4,2,0,1,2,3,4,2,0,1,2,6,4,2,0,1,8,6,4,2,0), byrow=TRUE, nrow=5)
+```
+
+Penalty on Baseline Model
+
+Calculating Penalty of Baseline Model
+```{r}
+as.matrix(table(ClaimsTest$bucket2009, ClaimsTest$bucket2008))*PenaltyMatrix
+sum(as.matrix(table(ClaimsTest$bucket2009, ClaimsTest$bucket2008))*PenaltyMatrix)/nrow(ClaimsTest)
+```
+#### Quick Question
+
+Suppose that instead of the baseline method discussed in the previous video, we used the baseline method of predicting the most frequent outcome for all observations. **This new baseline method would predict cost bucket 1 for everyone.**
+
+What would the accuracy of this baseline method be on the test set?
+
+```{r}
+pred_ones = rep(1,nrow(ClaimsTest))
+sum(ClaimsTest$bucket2009==pred_ones)/nrow(ClaimsTest)
+```
+
+Baseline Model Accuracy
+```{r}
+sum(as.matrix(table(ClaimsTest$bucket2009,pred_ones))*PenaltyMatrix[,1])/nrow(ClaimsTest)
+```
