@@ -1,0 +1,177 @@
+---
+title: "Week 5 - Lectures"
+author: "Vishal Gupta"
+date: "3/25/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE}
+library(dplyr)
+library(rpart)
+library(rpart.plot)
+library(caTools)
+library(ROCR)
+library(randomForest)
+```
+
+## Turning Tweets into Knowledge
+
+#### Video 5: Pre-Processing in R
+
+Loading tweets
+```{r}
+tweets = read.csv("~/Downloads/tweets.csv", stringsAsFactors=FALSE)
+str(tweets)
+```
+
+Adding a `Negative` field (sentiment)
+```{r}
+tweets$Negative = as.factor(tweets$Avg <= -1)
+table(tweets$Negative)
+```
+
+Installing new packages
+```{r}
+#install.packages("tm")
+library(tm)
+#install.packages("SnowballC")
+library(SnowballC)
+```
+
+Creating Corpus from Tweets
+```{r}
+corpus = Corpus(VectorSource(tweets$Tweet))
+content(corpus[[1]])
+```
+
+Convert tweets to lower-case
+```{r}
+corpus = tm_map(corpus, tolower)
+content(corpus[[1]])
+```
+
+Remove punctuation from tweets
+```{r}
+corpus = tm_map(corpus, removePunctuation)
+content(corpus[[1]])
+```
+
+corpus = tm_map(corpus, PlainTextDocument)
+
+Removing stopwords from tweets
+```{r}
+stopwords("english")[1:10]
+corpus = tm_map(corpus, removeWords, c("apple", stopwords("english")))
+content(corpus[1])
+```
+
+Get word stems 
+```{r}
+corpus = tm_map(corpus, stemDocument)
+content(corpus[[1]])
+```
+
+#### Video 6: Bag of Words in R
+
+Creating BOW matrix
+```{r}
+frequencies = DocumentTermMatrix(corpus)
+frequencies
+```
+
+Inspecting BOW matrix for documents 1000 to 1006 & words 505 to 515
+```{r}
+inspect(frequencies[1000:1006,505:515])
+```
+
+Get words that occur atleast 20 times in corpus
+```{r}
+findFreqTerms(frequencies,lowfreq = 20)
+```
+#### Quick Question
+
+In the previous video, we showed a list of all words that appear at least 20 times in our tweets. Which of the following words appear at least 100 times? 
+
+```{r}
+findFreqTerms(frequencies,lowfreq = 100)
+```
+
+
+Remove sparse terms from BOW matrix and create dataframe 
+```{r}
+sparse = removeSparseTerms(frequencies, 0.995)
+sparse
+tweetsSparse = as.data.frame(as.matrix(sparse))
+colnames(tweetsSparse) = make.names(colnames((tweetsSparse)))
+tweetsSparse$Negative = tweets$Negative
+```
+Split into Test and Train set
+```{r}
+set.seed(123)
+split = sample.split(tweetsSparse$Negative, SplitRatio = 0.7)
+trainSparse = tweetsSparse[split==TRUE,]
+testSparse = tweetsSparse[split==FALSE,]
+```
+
+
+Training a CART model to predict negative sentiment
+```{r}
+tweetCART = rpart(Negative ~ ., data=trainSparse, method="class")
+prp(tweetCART)
+```
+
+Evaluate the performance of CART model
+```{r}
+predictCART = predict(tweetCART, newdata=testSparse, type="class")
+table(testSparse$Negative, predictCART)
+```
+
+Accuracy of CART model
+```{r}
+sum(testSparse$Negative==predictCART)/nrow(testSparse)
+```
+
+Accuracy of Baseline model
+```{r}
+sum(testSparse$Negative==FALSE)/nrow(testSparse)
+```
+
+Training a Random Forest model to predict negative sentiment
+```{r}
+tweetRF = randomForest(Negative ~ ., data= trainSparse)
+predictRF = predict(tweetRF,testSparse)
+table(predictRF,testSparse$Negative)
+```
+Accuracy of Random Forest Model
+```{r}
+sum(testSparse$Negative==predictRF)/nrow(testSparse)
+```
+ 
+#### Quick Question
+
+In the previous video, we used CART and Random Forest to predict sentiment. Let's see how well logistic regression does. Build a logistic regression model (using the training set) to predict "Negative" using all of the independent variables. You may get a warning message after building your model - don't worry (we explain what it means in the explanation).
+
+```{r}
+tweetLog = glm(Negative ~ ., data= trainSparse, family = binomial)
+```
+
+Now, make predictions using the logistic regression model:
+
+```
+predictions = predict(tweetLog, newdata=testSparse, type="response")
+```
+
+```{r}
+predictions = predict(tweetLog, newdata=testSparse, type="response")
+sum((predictions>0.5)==testSparse$Negative)/nrow(testSparse)
+```
+
+where "tweetLog" should be the name of your logistic regression model. You might also get a warning message after this command, but don't worry - it is due to the same problem as the previous warning message.
+
+Build a confusion matrix (with a threshold of 0.5) and compute the accuracy of the model. What is the accuracy?
+
+
