@@ -10,3 +10,4 @@
 |5|[Lectures and Quick Questions](http://vishalgupta.me/AnalyticsEdge/week5_lectures_QQ.html)|[Source](http://vishalgupta.me/AnalyticsEdge/htmlNB/week5_lectures_QQ.Rmd)|
 |5|[ASG1 : Detecting Vandalism on Wikipedia](http://vishalgupta.me/AnalyticsEdge/htmlNB/week5_assig1.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week5_assig1.Rmd)|
 |5|[ASG2 : Automating Reviews in Medicine](http://vishalgupta.me/AnalyticsEdge/htmlNB/week5_assig2.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week5_assig2.Rmd)|
+|5|[ASG3 : Separating Spam from Ham](http://vishalgupta.me/AnalyticsEdge/htmlNB/week5_assig3.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week5_assig3.Rmd)|
