@@ -1,5 +1,6 @@
 |Week|Topic|.Rmd|
 |---|---|---|
+|3|[Lectures and Quick Questions](http://vishalgupta.me/AnalyticsEdge/week3_lectures_QQ.html)|[Source](http://vishalgupta.me/AnalyticsEdge/htmlNB/week3_lectures_QQ.Rmd)|
 |3|[ASG1 : Popularity of Music Records](http://vishalgupta.me/AnalyticsEdge/htmlNB/week3_assig1.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week3_assig1.Rmd)|
 |3|[ASG2 : Predicting Parole Violators](http://vishalgupta.me/AnalyticsEdge/htmlNB/week3_assig2.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week3_assig2.Rmd)|
 |3|[ASG3 : Predicting Loan Repayment](http://vishalgupta.me/AnalyticsEdge/htmlNB/week3_assig3.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week3_assig3.Rmd)|

@@ -1,0 +1,275 @@
+---
+title: "Week 3 - Lectures & Quick Questions"
+author: "Vishal Gupta"
+date: "3/30/2019"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=5, fig.height=3,fig.align = "center")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE}
+library(dplyr)
+library(caTools)
+library(ROCR)
+```
+
+## Modeling the Expert: An Introduction to Logistic Regression
+
+#### Video 4: Logistic Regression in R
+
+Loading the dataset
+```{r}
+quality = read.csv("~/Downloads/quality.csv")
+str(quality)
+```
+
+Distibution of target
+```{r}
+table(quality$PoorCare)
+```
+
+Baseline accuracy
+```{r}
+98/131
+```
+
+Install and load caTools packages
+- Tools for moving window statistics, GIF, Base64, ROC AUC,
+```{r}
+#install.packages("caTools")
+library(caTools)
+```
+
+Randomly split data on `PoorCare` : 75% for Training and 25% for testing
+
+Randomly split data on `PoorCase` : 75% for Training & 25% Testing
+```{r}
+set.seed(88)
+split = sample.split(quality$PoorCare, SplitRatio = 0.75)
+qualityTrain = subset(quality, split == TRUE)
+qualityTest = subset(quality, split == FALSE)
+```
+
+
+Creating Logistic Regression Model to predict `PoorCare` using `OfficeVisits` and `Narcotics`
+```{r}
+QualityLog = glm(PoorCare ~ OfficeVisits + Narcotics, data=qualityTrain, family=binomial)
+summary(QualityLog)
+```
+
+
+Make predictions on training set
+```{r}
+predictTrain = predict(QualityLog, type="response")
+```
+
+Get accuracy on training set
+```{r}
+summary(predictTrain)
+tapply(predictTrain, qualityTrain$PoorCare, mean)
+```
+
+
+#### Quick Question
+
+What is the coefficient for "StartedOnCombination"?
+```{r}
+QualityLog2 = glm(PoorCare ~ ProviderCount + StartedOnCombination, data=qualityTrain, family=binomial)
+summary(QualityLog2)
+```
+
+StartedOnCombination is a binary variable, which equals 1 if the patient is started on a combination of drugs to treat their diabetes, and equals 0 if the patient is not started on a combination of drugs. All else being equal, does this model imply that starting a patient on a combination of drugs is indicative of poor care, or good care?
+
+- **Poor Care**
+- Good Care
+
+#### Video 5: Thresholding
+
+Confusion matrix with threshold = 0.5
+```{r}
+table(qualityTrain$PoorCare, predictTrain > 0.5)
+```
+
+Sensitivity and Specificity
+```{r}
+10/25
+70/74
+```
+
+Confusion matrix with threshold = 0.7
+```{r}
+table(qualityTrain$PoorCare, predictTrain > 0.7)
+```
+
+Sensitivity and Specificity
+```{r}
+8/25
+73/74
+```
+
+Confusion matrix with threshold = 0.2
+```{r}
+table(qualityTrain$PoorCare, predictTrain > 0.2)
+```
+
+Sensitivity and Specificity
+```{r}
+16/25
+54/74
+```
+
+#### Quick Question
+This question asks about the following two confusion matrices:
+
+Confusion Matrix #1:
+
+| x |Predicted = 0	|Predicted = 1|
+|---|---|---|
+|Actual = 0 |	15 |	10|
+|Actual = 1	| 5	| 20|
+
+Confusion Matrix #2:
+
+| x | Predicted = 0	| Predicted = 1| 
+|---|---|---|
+|Actual = 0 |	20 |	5 |
+|Actual = 1	| 10 |	15|
+
+#### Quick Question
+
+What is the sensitivity of Confusion Matrix #1?
+
+```{r}
+20/(20+5)
+```
+
+What is the specificity of Confusion Matrix #1?
+
+```{r}
+15/(15+10)
+```
+
+
+
+#### Video 6: ROC Curves
+
+Install and load ROCR
+```{r}
+#install.packages("ROCR")
+library(ROCR)
+```
+
+Prediction
+```{r}
+ROCRpred = prediction(predictTrain, qualityTrain$PoorCare)
+```
+
+Plot ROC curves with performance
+```{r}
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+plot(ROCRperf)
+plot(ROCRperf, colorize=TRUE)
+plot(ROCRperf, colorize=TRUE, print.cutoffs.at=seq(0,1,by=0.1), text.adj=c(-0.2,1.7))
+```
+
+#### Quick Question
+![](https://prod-edxapp.edx-cdn.org/assets/courseware/v1/e20f771a3a7e7a292d3f9a8d072976b3/asset-v1:MITx+15.071x+1T2019+type@asset+block/ROC-Thresholds.png)
+Given this ROC curve, which threshold would you pick if you wanted to correctly identify a small group of patients who are receiving the worst care with high confidence?
+
+- t = 0.2
+- t = 0.3
+- **t = 0.7**
+- t = 0.8
+
+Which threshold would you pick if you wanted to correctly identify half of the patients receiving poor care, while making as few errors as possible?
+
+- t = 0.2
+- **t = 0.3**
+- t = 0.7
+- t = 0.8
+
+
+## The Framingham Heart Study: Evaluating Risk Factors to Save Lives
+
+#### Video 3: A Logistic Regression Model
+
+Load the dataset
+```{r}
+framingham = read.csv("~/Downloads/framingham.csv")
+str(framingham)
+```
+
+Load the `caTools` to split data into training and testing
+```{r}
+library(caTools)
+```
+
+Randomly split data on `TenYearCHD` : 75% for Training & 25% Testing
+```{r}
+set.seed(1000)
+split = sample.split(framingham$TenYearCHD, SplitRatio = 0.65)
+train = subset(framingham, split==TRUE)
+test = subset(framingham, split==FALSE)
+```
+
+Train Logistic regression model to predict `TenYearCHD` from training set
+```{r}
+framinghamLog = glm(TenYearCHD ~ ., data = train, family=binomial)
+summary(framinghamLog)
+```
+
+Predicting `TenYearCHD` of test samples
+```{r}
+predictTest = predict(framinghamLog, type="response", newdata=test)
+```
+
+Confusion matrix with threshold = 0.5
+```{r}
+table(test$TenYearCHD, predictTest > 0.5)
+```
+
+
+Accuracy on test set
+```{r}
+(1069+11)/(1069+6+187+11)
+```
+
+Baseline accuracy on test set
+```{r}
+(1069+6)/(1069+6+187+11) 
+```
+
+Calculating test set AUC 
+```{r}
+library(ROCR)
+ROCRpred = prediction(predictTest, test$TenYearCHD)
+as.numeric(performance(ROCRpred, "auc")@y.values)
+```
+
+
+#### Quick Question
+
+In the previous video, we computed the following confusion matrix for our logistic regression model on our test set with a threshold of 0.5:
+
+| x | FALSE	| TRUE |
+|---|---|---|
+| 0	| 1069 |	6 |
+| 1	| 187 |	11 |
+
+Using this confusion matrix, answer the following questions.
+
+What is the sensitivity of our logistic regression model on the test set, using a threshold of 0.5?
+```{r}
+11/(11+187)
+```
+
+What is the specificity of our logistic regression model on the test set, using a threshold of 0.5?
+```{r}
+1069/(1069+6)
+```
