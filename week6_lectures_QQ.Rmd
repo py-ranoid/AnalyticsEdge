@@ -1,0 +1,127 @@
+---
+title: "Week 6 - Lectures & Quick Questions"
+author: "Vishal Gupta"
+date: "3/30/2019"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=5, fig.height=3,fig.align = "center")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE}
+library(dplyr)
+library(rpart)
+library(rpart.plot)
+library(caTools)
+library(ROCR)
+library(randomForest)
+```
+
+
+## Recommendations Worth a Million: An Introduction to Clustering
+
+
+#### Video 6: Getting the Data
+
+Loading the data
+```{r}
+movies = read.table("~/Downloads/movieLens.txt", header=FALSE, sep="|",quote="\"")
+```
+
+Adding column names
+```{r}
+colnames(movies) = c("ID", "Title", "ReleaseDate", "VideoReleaseDate", "IMDB", "Unknown", "Action", "Adventure", "Animation", "Childrens", "Comedy", "Crime", "Documentary", "Drama", "Fantasy", "FilmNoir", "Horror", "Musical", "Mystery", "Romance", "SciFi", "Thriller", "War", "Western")
+str(movies)
+```
+
+Remove unnecessary variables
+```{r}
+movies$ID = NULL
+movies$ReleaseDate = NULL
+movies$VideoReleaseDate = NULL
+movies$IMDB = NULL
+```
+
+Remove duplicates
+```{r}
+movies = unique(movies)
+```
+
+#### Quick Question
+Using the table function in R, please answer the following questions about the dataset "movies".
+
+How many movies are classified as comedies?
+
+```{r}
+table(movies$Comedy)
+```
+
+How many movies are classified as westerns?
+```{r}
+table(movies$Western)
+```
+
+How many movies are classified as romance AND drama?
+
+```{r}
+table(movies$Romance & movies$Drama)
+```
+
+```{r}
+
+```
+
+#### Video 7: Hierarchical Clustering in R
+
+Compute distances
+```{r}
+distances = dist(movies[2:20], method = "euclidean")
+```
+
+Hierarchical clustering
+```{r}
+clusterMovies = hclust(distances, method = "ward") 
+plot(clusterMovies)
+```
+
+
+Assign points to clusters
+```{r}
+clusterGroups = cutree(clusterMovies, k = 10)
+```
+
+Computing the percentage of movies in each genre and cluster
+```{r}
+tapply(movies$Action, clusterGroups, mean)
+tapply(movies$Romance, clusterGroups, mean)
+```
+
+Finding which cluster Men in Black is in.
+```{r}
+movies[movies$Title=="Men in Black (1997)",0]
+clusterGroups[257]
+```
+
+Create a new data set with just the movies from cluster 2
+```{r}
+cluster2 = subset(movies, clusterGroups==2)
+```
+
+First 10 titles in cluster 2
+```{r}
+cluster2$Title[1:10]
+```
+#### Quick Question
+
+Run the cutree function again to create the cluster groups, but this time pick k = 2 clusters. It turns out that the algorithm groups all of the movies that only belong to one specific genre in one cluster (cluster 2), and puts all of the other movies in the other cluster (cluster 1). What is the genre that all of the movies in cluster 2 belong to?
+
+```{r}
+colSums(movies[cutree(clusterMovies,k=2) ==2,2:20])
+```
+
+
