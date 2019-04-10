@@ -19,3 +19,4 @@
 |7|[Lectures and Quick Questions](http://vishalgupta.me/AnalyticsEdge/htmlNB/week7_lectures_QQ.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week7_lectures_QQ.Rmd)|
 |7|[ASG1 : Election Forecasting Revisited](http://vishalgupta.me/AnalyticsEdge/htmlNB/week7_assig1.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week7_assig1.Rmd)|
 |7|[ASG2 : Visualizing Network Data](http://vishalgupta.me/AnalyticsEdge/htmlNB/week7_assig2.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week7_assig2.Rmd)|
+|7|[ASG3 : Visualizing Text Data Using Word Clouds](http://vishalgupta.me/AnalyticsEdge/htmlNB/week7_assig3.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week7_assig3.Rmd)|
