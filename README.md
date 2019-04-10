@@ -16,3 +16,6 @@
 |6|[ASG1 : Document Clustering with Daily Kos](http://vishalgupta.me/AnalyticsEdge/htmlNB/week6_assig1.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week6_assig1.Rmd)|
 |6|[ASG2 : Market Segmentation for Airlines](http://vishalgupta.me/AnalyticsEdge/htmlNB/week6_assig2.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week6_assig2.Rmd)|
 |6|[ASG3 : Predicting Stock Returns with Cluster-Then-Predict](http://vishalgupta.me/AnalyticsEdge/htmlNB/week6_assig3.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week6_assig3.Rmd)|
+|7|[Lectures and Quick Questions](http://vishalgupta.me/AnalyticsEdge/htmlNB/week7_lectures_QQ.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week7_lectures_QQ.Rmd)|
+|7|[ASG1 : Election Forecasting Revisited](http://vishalgupta.me/AnalyticsEdge/htmlNB/week7_assig1.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week7_assig1.Rmd)|
+|7|[ASG2 : Visualizing Network Data](http://vishalgupta.me/AnalyticsEdge/htmlNB/week7_assig2.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week7_assig2.Rmd)|

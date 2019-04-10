@@ -1,0 +1,389 @@
+---
+title: "Week 7 - Lectures & Quick Questions"
+author: "Vishal Gupta"
+date: "4/9/2019"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=5, fig.height=3,fig.align = "center")
+```
+
+```{r}
+library(ggplot2)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Visualizing the World: An Introduction to Visualization
+
+#### Video 4: Basic Scatterplots Using ggplot
+
+Loading the WHO data
+```{r}
+WHO = read.csv("~/Downloads/WHO.csv")
+str(WHO)
+```
+
+Plotting with `plot`
+```{r}
+plot(WHO$GNI,WHO$FertilityRate)
+```
+
+Plotting with `plot`
+```{r}
+scatterplot = ggplot(WHO, aes(x=GNI,y=FertilityRate))
+scatterplot + geom_point()
+scatterplot + geom_line()
+```
+
+Changing colors and shapes
+```{r}
+scatterplot + geom_point(color = "blue", size = 3, shape = 17) 
+scatterplot + geom_point(color = "darkred", size = 3, shape = 8) 
+```
+
+Changing title
+```{r}
+scatterplot + geom_point(colour = "blue", size = 3, shape = 17) + ggtitle("Fertility Rate vs. Gross National Income")
+```
+
+Printing plit to pdf
+```{r}
+fertilityGNIplot = scatterplot + geom_point(colour = "blue", size = 3, shape = 17) + ggtitle("Fertility Rate vs. Gross National Income")
+pdf("MyPlot.pdf")
+print(fertilityGNIplot)
+dev.off()
+```
+#### Quick Question
+
+In R, change the shape of your points to the number 15. What shape are the points now?
+
+- Circles
+- Diamonds
+- Crosses
+- **Squares**
+- Stars
+
+```{r}
+scatterplot + geom_point(color = "blue", size = 3, shape = 15) 
+```
+
+#### Video 5 - More advanced Scatterplots
+
+
+Color the points by region
+```{r}
+ggplot(WHO, aes(x = GNI, y = FertilityRate, color = Region)) + geom_point()
+```
+
+
+Color the points according to life expectancy
+```{r}
+ggplot(WHO, aes(x = GNI, y = FertilityRate, color = LifeExpectancy)) + geom_point()
+```
+
+
+Using fertility rate to predict percentage of the population under 15.
+```{r}
+ggplot(WHO, aes(x = FertilityRate, y = Under15)) + geom_point()
+ggplot(WHO, aes(x = log(FertilityRate), y = Under15)) + geom_point()
+```
+
+
+
+Using a Linear regression model to predict the percentage of the population under 15, using the log of the fertility rate.
+```{r}
+mod = lm(Under15 ~ log(FertilityRate), data = WHO)
+summary(mod)
+```
+
+
+Adding regression line to the plot
+```{r}
+ggplot(WHO, aes(x = log(FertilityRate), y = Under15)) + geom_point() + stat_smooth(method = "lm")
+```
+
+
+PLotting regression line with 99% confidence interval
+```{r}
+ggplot(WHO, aes(x = log(FertilityRate), y = Under15)) + geom_point() + stat_smooth(method = "lm", level = 0.99)
+```
+
+PLotting regression line without confidence interval
+```{r}
+ggplot(WHO, aes(x = log(FertilityRate), y = Under15)) + geom_point() + stat_smooth(method = "lm", se = FALSE)
+```
+
+Change the color of the regression line
+```{r}
+ggplot(WHO, aes(x = log(FertilityRate), y = Under15)) + geom_point() + stat_smooth(method = "lm", colour = "orange")
+```
+
+#### Quick Question
+Create the fertility rate versus population under 15 plot again:
+```
+ggplot(WHO, aes(x = FertilityRate, y = Under15)) + geom_point()
+```
+Now, color the points by the Region variable.
+One region in particular has a lot of countries with a very low fertility rate and a very low percentage of the population under 15. Which region is it?
+
+- Africa
+- Americas
+- Eastern Mediterranean
+- **Europe**
+- South-East Asia
+- Western Pacific
+
+```{r}
+ggplot(WHO, aes(x = log(FertilityRate), y = Under15, color = Region)) + geom_point() + stat_smooth(method = "lm", colour = "orange")
+```
+
+
+## Predictive Policing
+
+#### Video 3 - A Basic Line Plot
+
+Load data
+```{r}
+mvt = read.csv("~/Downloads/mvt.csv", stringsAsFactors=FALSE)
+str(mvt)
+```
+
+Convert the Date variable to a format that R will recognize
+```{r}
+mvt$Date = strptime(mvt$Date, format="%m/%d/%y %H:%M")
+```
+
+Extract the hour and the day of the week
+```{r}
+mvt$Weekday = weekdays(mvt$Date)
+mvt$Hour = mvt$Date$hour
+str(mvt)
+```
+
+Simple line plot - Total number of crimes on each day of the week
+```{r}
+table(mvt$Weekday)
+WeekdayCounts = as.data.frame(table(mvt$Weekday))
+str(WeekdayCounts)
+ggplot(WeekdayCounts, aes(x=Var1, y=Freq)) + geom_line(aes(group=1))  
+```
+
+Make the "Var1" variable an ORDERED factor variable of Days
+```{r}
+WeekdayCounts$Var1 = factor(WeekdayCounts$Var1, ordered=TRUE, levels=c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday","Saturday"))
+ggplot(WeekdayCounts, aes(x=Var1, y=Freq)) + geom_line(aes(group=1))
+```
+
+Change x and y labels
+```{r}
+ggplot(WeekdayCounts, aes(x=Var1, y=Freq)) + geom_line(aes(group=1)) + xlab("Day of the Week") + ylab("Total Motor Vehicle Thefts")
+```
+
+#### Quick Question
+
+Create a new line plot, like the one in Video 3, but add the argument "linetype=2". So the geom_line part of the plotting command should look like:
+```
+geom_line(aes(group=1), linetype=2)
+```
+What does this do?
+```{r}
+ggplot(WeekdayCounts, aes(x=Var1, y=Freq)) + geom_line(aes(group=1), linetype=2) + xlab("Day of the Week") + ylab("Total Motor Vehicle Thefts")
+```
+
+- Makes the line thicker
+- Changes the color of the line to blue
+- **Makes the line dashed**
+- Makes the line lighter in color
+
+Now, change the alpha parameter to 0.3 by replacing "linetype=2" with "alpha=0.3" in the plot command. What does this do?
+
+```{r}
+ggplot(WeekdayCounts, aes(x=Var1, y=Freq)) + geom_line(aes(group=1), alpha=0.3) + xlab("Day of the Week") + ylab("Total Motor Vehicle Thefts")
+```
+
+- Makes the line thicker
+- Changes the color of the line to blue
+- Makes the line dashed
+- **Makes the line lighter in color**
+
+
+#### Video 4 - Adding the Hour of the Day
+
+Create a counts table for the weekday and hour
+```{r}
+table(mvt$Weekday, mvt$Hour)
+DayHourCounts = as.data.frame(table(mvt$Weekday, mvt$Hour))
+str(DayHourCounts)
+```
+
+Convert the second variable, Var2, to numbers and call it Hour
+```{r}
+DayHourCounts$Hour = as.numeric(as.character(DayHourCounts$Var2))
+```
+
+Create plot
+```{r}
+ggplot(DayHourCounts, aes(x=Hour, y=Freq)) + geom_line(aes(group=Var1))
+ggplot(DayHourCounts, aes(x=Hour, y=Freq)) + geom_line(aes(group=Var1, color=Var1), size=2)
+```
+
+Separate the weekends from the weekdays
+```{r}
+DayHourCounts$Type = ifelse((DayHourCounts$Var1 == "Sunday") | (DayHourCounts$Var1 == "Saturday"), "Weekend", "Weekday")
+```
+
+Redo the plot, this time coloring by Type
+```{r}
+ggplot(DayHourCounts, aes(x=Hour, y=Freq)) + geom_line(aes(group=Var1, color=Type), size=2) 
+```
+  
+
+Make the lines a little transparent
+```{r}
+ggplot(DayHourCounts, aes(x=Hour, y=Freq)) + geom_line(aes(group=Var1, color=Type), size=2, alpha=0.5) 
+```
+
+
+Fix the order of the days:
+```{r}
+DayHourCounts$Var1 = factor(DayHourCounts$Var1, ordered=TRUE, levels=c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+
+```
+
+Make a heatmap
+```{r}
+ggplot(DayHourCounts, aes(x = Hour, y = Var1)) + geom_tile(aes(fill = Freq))
+```
+
+Change the label on the legend, and get rid of the y-label
+```{r}
+ggplot(DayHourCounts, aes(x = Hour, y = Var1)) + geom_tile(aes(fill = Freq)) + scale_fill_gradient(name="Total MV Thefts") + theme(axis.title.y = element_blank())
+```
+
+Change the color scheme ie. `low="white", high="red"`
+```{r}
+ggplot(DayHourCounts, aes(x = Hour, y = Var1)) + geom_tile(aes(fill = Freq)) + scale_fill_gradient(name="Total MV Thefts", low="white", high="red") + theme(axis.title.y = element_blank())
+```
+
+
+
+
+
+##### Video 5 - Maps
+
+Install and load two new packages
+```{r}
+#install.packages("maps")
+#install.packages("ggmap")
+library(maps)
+library(ggmap)
+```
+
+Load a map of Chicago into R
+```{r}
+#chicago = get_map(location = "chicago", zoom = 11)
+#ggmap(chicago)
+```
+
+Round our latitude and longitude to 2 digits of accuracy, and create a crime counts data frame for each area
+```{r}
+LatLonCounts = as.data.frame(table(round(mvt$Longitude,2), round(mvt$Latitude,2)))
+str(LatLonCounts)
+```
+
+Convert our Longitude and Latitude variable to numbers
+```{r}
+LatLonCounts$Long = as.numeric(as.character(LatLonCounts$Var1))
+LatLonCounts$Lat = as.numeric(as.character(LatLonCounts$Var2))
+
+```
+
+#### Quick Question
+
+In the previous video, our heatmap was plotting squares out in the water, which seems a little strange. We can fix this by removing the observations from our data frame that have Freq = 0.
+
+Take a subset of LatLonCounts, only keeping the observations for which Freq > 0, and call it LatLonCounts2.
+
+If you redo the heatmap from the end of Video 5, using LatLonCounts2 instead of LatLonCounts, then you should no longer see any squares out in the water, or in any areas where there were no motor vehicle thefts.
+
+How many observations did we remove? (You do not need to use the heatmap to answer this question)
+```{r}
+sum(LatLonCounts$Freq<=0)
+```
+
+#### Video 6 - Geographical Map on US
+
+Load our data
+```{r}
+murders = read.csv("~/Downloads/murders.csv")
+str(murders)
+```
+
+Load the map of the US
+```{r}
+statesMap = map_data("state")
+str(statesMap)
+```
+
+
+Plot a map of states in the US
+```{r}
+ggplot(statesMap, aes(x = long, y = lat, group = group)) + geom_polygon(fill = "white", color = "black") 
+```
+
+
+Create a new variable called region with the lowercase names to match the statesMap
+```{r}
+murders$region = tolower(murders$State)
+```
+
+Join the statesMap data and the murders data into one dataframe
+```{r}
+murderMap = merge(statesMap, murders, by="region")
+str(murderMap)
+```
+
+
+Plot the number of murder on our map of the United States
+```{r}
+ggplot(murderMap, aes(x = long, y = lat, group = group, fill = Murders)) + geom_polygon(color = "black") + scale_fill_gradient(low = "black", high = "red", guide = "legend")
+```
+
+Plot a map of the population
+```{r}
+ggplot(murderMap, aes(x = long, y = lat, group = group, fill = Population)) + geom_polygon(color = "black") + scale_fill_gradient(low = "black", high = "red", guide = "legend")
+```
+
+
+Create a new variable that is the number of murders per 100,000 population
+```{r}
+murderMap$MurderRate = murderMap$Murders / murderMap$Population * 100000
+```
+
+Redo our plot with murder rate
+```{r}
+ggplot(murderMap, aes(x = long, y = lat, group = group, fill = MurderRate)) + geom_polygon(color = "black") + scale_fill_gradient(low = "black", high = "red", guide = "legend")
+```
+
+
+Redo the plot, removing any states with murder rates above 10:
+```{r}
+ggplot(murderMap, aes(x = long, y = lat, group = group, fill = MurderRate)) + geom_polygon(color = "black") + scale_fill_gradient(low = "black", high = "red", guide = "legend", limits = c(0,10))
+```
+
+
+#### Quick Question
+
+Redo the map from Video 6, but this time fill each state with the variable GunOwnership. This shows the percentage of people in each state who own a gun.
+
+Which of the following states has the highest gun ownership rate? To see the state labels, take a look at the World Atlas map here.
+
+```{r}
+library(dplyr)
+murderMap %>% group_by(region) %>% summarise(x = mean(GunOwnership)) %>% arrange(desc(x))
+```
+

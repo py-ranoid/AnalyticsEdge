@@ -1,0 +1,226 @@
+---
+title: "Week 7 - Visualizing Network Data"
+author: "Vishal Gupta"
+date: "4/10/2019"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.align = "center")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE}
+library(dplyr)
+library(ggmap)
+library(ggplot2)
+```
+
+#### Problem 1.1 - Summarizing the Data
+
+Load the data from edges.csv into a data frame called edges, and load the data from users.csv into a data frame called users.
+```{r}
+edges = read.csv("~/Downloads/edges.csv")
+users = read.csv("~/Downloads/users.csv")
+```
+
+How many Facebook users are there in our dataset?
+
+```{r}
+nrow(users)
+```
+
+In our dataset, what is the average number of friends per user? Hint: this question is tricky, and it might help to start by thinking about a small example with two users who are friends.
+```{r}
+nrow(edges)*2/nrow(users)
+```
+
+
+
+#### Problem 1.2 - Summarizing the Data
+
+Out of all the students who listed a school, what was the most common locale?
+
+```{r}
+table(users$school,users$locale)
+```
+- Locale A**
+- **Locale B**
+
+
+#### Problem 1.3 - Summarizing the Data
+1 point possible (graded)
+Is it possible that either school A or B is an all-girls or all-boys school?
+```{r}
+table(users$locale,users$gender)
+```
+
+- **No**
+- Yes
+
+#### Problem 2.1 - Creating a Network
+
+We will be using the igraph package to visualize networks; install and load this package using the install.packages and library commands.
+```{r}
+#install.packages('igraph')
+library(igraph)
+```
+
+We can create a new graph object using the graph.data.frame() function. Based on ?graph.data.frame, which of the following commands will create a graph g describing our social network, with the attributes of each user correctly loaded?
+
+Note: A directed graph is one where the edges only go one way -- they point from one vertex to another. The other option is an undirected graph, which means that the relations between the vertices are symmetric.
+
+
+- **g = graph.data.frame(edges, FALSE, users)**
+- g = graph.data.frame(users, FALSE, edges)
+- g = graph.data.frame(edges, TRUE, users)
+- g = graph.data.frame(users, TRUE, edges)
+
+```{r}
+g = graph.data.frame(edges, FALSE, users)
+```
+
+
+#### Problem 2.2 - Creating a Network
+
+Use the correct command from Problem 2.1 to load the graph g.
+
+Now, we want to plot our graph. By default, the vertices are large and have text labels of a user's identifier. Because this would clutter the output, we will plot with no text labels and smaller vertices:
+
+
+```{r}
+plot(g, vertex.size=5, vertex.label=NA)
+```
+
+In this graph, there are a number of groups of nodes where all the nodes in each group are connected but the groups are disjoint from one another, forming "islands" in the graph. Such groups are called "connected components," or "components" for short. How many connected components with at least 2 nodes are there in the graph?
+
+**4**
+
+How many users are there with no friends in the network?
+
+**7**
+
+#### Problem 2.3 - Creating a Network
+
+In our graph, the "degree" of a node is its number of friends. We have already seen that some nodes in our graph have degree 0 (these are the nodes with no friends), while others have much higher degree. We can use degree(g) to compute the degree of all the nodes in our graph g.
+
+How many users are friends with 10 or more other Facebook users in this network?
+
+```{r}
+sum(degree(g) >= 10)
+```
+
+
+
+
+#### Problem 2.4 - Creating a Network
+
+In a network, it's often visually useful to draw attention to "important" nodes in the network. While this might mean different things in different contexts, in a social network we might consider a user with a large number of friends to be an important user. From the previous problem, we know this is the same as saying that nodes with a high degree are important users.
+
+To visually draw attention to these nodes, we will change the size of the vertices so the vertices with high degrees are larger. To do this, we will change the "size" attribute of the vertices of our graph to be an increasing function of their degrees:
+```{r}
+V(g)$size = degree(g)/2+2
+```
+
+Now that we have specified the vertex size of each vertex, we will no longer use the vertex.size parameter when we plot our graph:
+```{r}
+plot(g, vertex.label=NA)
+```
+What is the largest size we assigned to any node in our graph?
+```{r}
+max(V(g)$size)
+```
+
+What is the smallest size we assigned to any node in our graph?
+```{r}
+min(V(g)$size)
+```
+
+
+#### Problem 3.1 - Coloring Vertices
+
+Thus far, we have changed the "size" attributes of our vertices. However, we can also change the colors of vertices to capture additional information about the Facebook users we are depicting.
+
+When changing the size of nodes, we first obtained the vertices of our graph with V(g) and then accessed the the size attribute with V(g)$size. To change the color, we will update the attribute V(g)$color.
+
+To color the vertices based on the gender of the user, we will need access to that variable. When we created our graph g, we provided it with the data frame users, which had variables gender, school, and locale. These are now stored as attributes V(g)$gender, V(g)$school, and V(g)$locale.
+
+We can update the colors by setting the color to black for all vertices, than setting it to red for the vertices with gender A and setting it to gray for the vertices with gender B:
+
+```{r}
+V(g)$color = "black"
+V(g)$color[V(g)$gender == "A"] = "red"
+V(g)$color[V(g)$gender == "B"] = "gray"
+```
+
+
+Plot the resulting graph. What is the gender of the users with the highest degree in the graph?
+
+```{r}
+plot(g, vertex.label=NA)
+```
+
+
+- Missing gender value
+- Gender A
+- **Gender B**
+
+
+#### Problem 3.2 - Coloring Vertices
+
+Now, color the vertices based on the school that each user in our network attended.
+
+Are the two users who attended both schools A and B Facebook friends with each other?
+
+```{r}
+V(g)$color = "black"
+V(g)$color[V(g)$school == "A"] = "red"
+V(g)$color[V(g)$school == "AB"] = "yellow"
+plot(g, vertex.label=NA)
+```
+
+
+- **Yes**
+- No
+
+What best describes the users with highest degree?
+
+- None of the high-degree users attended school A
+- **Some, but not all, of the high-degree users attended school A**
+- All of the high-degree users attended school A
+
+#### Problem 3.3 - Coloring Vertices
+
+Now, color the vertices based on the locale of the user.
+```{r}
+```{r}
+V(g)$color = "black"
+V(g)$color[V(g)$locale == "A"] = "red"
+V(g)$color[V(g)$locale == "B"] = "yellow"
+plot(g, vertex.label=NA)
+```
+
+The large connected component is most associated with which locale?
+
+- Locale A
+- **Locale B**
+
+The 4-user connected component is most associated with which locale?
+
+- **Locale A**
+- Locale B
+
+#### Problem 4 - Other Plotting Options
+
+The help page is a helpful tool when making visualizations. Answer the following questions with the help of ?igraph.plotting and experimentation in your R console.
+
+Which igraph plotting function would enable us to plot our graph in 3-D?
+
+**rglplot**
+
+What parameter to the plot() function would we use to change the edge width when plotting g?
+
+**edge.width**
