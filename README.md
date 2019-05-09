@@ -20,3 +20,7 @@
 |7|[ASG1 : Election Forecasting Revisited](http://vishalgupta.me/AnalyticsEdge/htmlNB/week7_assig1.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week7_assig1.Rmd)|
 |7|[ASG2 : Visualizing Network Data](http://vishalgupta.me/AnalyticsEdge/htmlNB/week7_assig2.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week7_assig2.Rmd)|
 |7|[ASG3 : Visualizing Text Data Using Word Clouds](http://vishalgupta.me/AnalyticsEdge/htmlNB/week7_assig3.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week7_assig3.Rmd)|
+|8|[Lectures and Quick Questions](http://vishalgupta.me/AnalyticsEdge/htmlNB/week8_lectures_QQ.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week8_lectures_QQ.Rmd)|
+|8|[ASG1 : Investment Management Under Taxation](http://vishalgupta.me/AnalyticsEdge/htmlNB/week8_assig1.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week8_assig1.Rmd)|
+|8|[ASG2 : Filatoi Riuniti](http://vishalgupta.me/AnalyticsEdge/htmlNB/week8_assig2.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week8_assig2.Rmd)|
+|8|[ASG3 : Gasoline Blending](http://vishalgupta.me/AnalyticsEdge/htmlNB/week8_assig3.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week8_assig3.Rmd)|
