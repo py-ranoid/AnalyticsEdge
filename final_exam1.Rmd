@@ -1,0 +1,267 @@
+---
+title: "Final Exam - Estimating Views"
+author: "Vishal Gupta"
+date: "5/1/2019"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=5, fig.height=3,fig.align = "center")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(randomForest)
+library(rpart)
+library(rpart.plot)
+library(caret)
+library(e1071)
+```
+
+#### Problem 1 - Exploratory Data Analysis
+
+Load youtube_train.csv into a data frame called train.
+```{r}
+yt_train = read.csv("~/Downloads/youtube_train.csv")
+yt_test = read.csv("~/Downloads/youtube_test.csv")
+```
+
+How many rows are in the training dataset?
+
+```{r}
+yt_train %>% nrow()
+```
+ 
+What is the average amount of likes per video in the training dataset?
+
+```{r}
+yt_train %>% summarise(ct = mean(likes))
+```
+ 
+What is the category of the video with most views in the training set?
+
+```{r}
+yt_train %>% group_by(category) %>% summarise(ct = sum(as.numeric(views))) %>% arrange(desc(ct))
+```
+
+- **Music**
+- Sports
+- Comedy
+- Entertainment
+- Shows
+- Film and Animation
+
+Which category has the least amount of dislikes in the training set?
+
+```{r}
+yt_train %>% group_by(category) %>% summarise(ct = sum(dislikes)) %>% arrange(ct)
+```
+
+- Education
+- Pets and Animals
+- **Shows**
+- People and Blogs
+- Comedy
+- Science and Technology
+- Sports
+
+In the training set, out of the videos with at least 1 million likes, how many have at least 100,000 comments?
+```{r}
+yt_train %>% filter(likes>=1000000) %>% filter(comment_count>=100000) %>% nrow() 
+```
+
+
+#### Problem  2.1 - Simple Linear Regression
+
+For the rest of this problem, we will be working with log(views), log(likes), log(dislikes), and log(comment_count), which helps us manage the outliers with excessively large amounts of views, likes, dislikes, and comments. The values of log(views), log(likes), log(dislikes), and log(comment_count) are found in the columns logviews, loglikes, logdislikes and logcomments, respectively.
+
+What is the value of log(views) that our baseline model predicts?
+
+```{r}
+mean(log(yt_train$views))
+```
+ 
+What is the correlation between log(views) and log(dislikes) in the training set?
+
+```{r}
+cor(log(yt_train$views),log(yt_train$dislikes))
+```
+
+ 
+Choose the most reasonable answer from the following statements:
+
+- Higher log of dislikes are associeted with higher log of views, likely because the popular videos often have many dislikes.
+- High log of dislikes are associated with less log of views.
+- There is no association between log of dislikes and log of views.
+
+#### Problem  2.2 - Simple Linear Regression (cont'd)
+
+Load youtube_test.csv into a data frame called test.
+Create a linear model that predicts log(views) using log(dislikes).
+
+```{r}
+yt_model = lm(logviews ~ logdislikes,data = yt_train)
+```
+
+What is the coefficient of log(dislikes)?
+```{r}
+summary(yt_model)
+```
+
+What is the R2 on the test set?
+```{r}
+y_pred = predict(yt_model,yt_test,type = 'response')
+y_true = yt_test$logviews
+rss = sum((y_pred - y_true) ^ 2)
+tss = sum((y_true - mean(y_true)) ^ 2)
+1 - rss/tss
+```
+
+
+#### Problem  3 - Adding More Variables
+
+As good practice, it is always helpful to first check for multicollinearity before running larger models.
+
+Examine the correlation between the following variables:
+
+logdislikes, loglikes, logcomments, tags, publish_month, and trending_month
+```{r}
+cor(yt_train$loglikes,yt_train$logdislikes)
+cor(yt_train$logcomments,yt_train$logdislikes)
+cor(yt_train$tags,yt_train$logcomments)
+cor(yt_train$trending_month,yt_train$tags)
+cor(yt_train$publish_month,yt_train$trending_month)
+cor(yt_train$logcomments,yt_train$loglikes)
+```
+
+Which of the following pairs of variables have correlation with magnitude above 0.8? Select all that apply.
+
+
+- **logdislikes**, **loglikes**
+- **logcomments**, **logdislikes**
+- tags, logcomments
+- trending_month, tags
+- **publish_month, trending_month**
+- **logcomments, loglikes**
+
+Create a linear model that predicts log(views) using the following variables:
+
+logdislikes, tags, and trending_month.
+
+```{r}
+yt_model_2 = lm(logviews ~ logdislikes + tags + trending_month,data = yt_train)
+```
+
+
+We have excluded loglikes, logcomments, and publish_month due to concerns about multicollinearity.
+
+What is the value of the intercept?
+```{r}
+summary(yt_model_2)
+```
+
+ 
+What is the R2 on the test set?
+```{r}
+y_pred = predict(yt_model_2,yt_test,type = 'response')
+y_true = yt_test$logviews
+rss = sum((y_pred - y_true) ^ 2)
+tss = sum((y_true - mean(y_true)) ^ 2)
+1 - rss/tss
+```
+
+
+#### Problem  4 - Interpreting Linear Regression
+
+Using the model from Problem 3, which of the following variables are significant at a level of 0.001 (p-value below 0.001)? Select all that apply.
+```{r}
+summary(yt_model_2)
+```
+
+
+- **logdislikes**
+- loglikes
+- **tags**
+- logviews
+- **trending_month**
+
+Using the model from Problem 3, how would you interpret the coefficient of tags?
+
+- **All else being equal, an increase in tags is associated with a 1.655e-04 increase in log(views).**
+- All else being equal, an increase in tags is associated with a 1.655e-04 decrease in log(views).
+
+Using the simple model from Problem 2, if the amount of dislikes is 1000, how many views does the model predict the video has?
+
+- 795.2351
+- 3182852
+- 1906.064
+- **928263.8**
+
+
+#### Problem  5 - CART and Random Forest
+
+In addition to the logistic regression model, we can also train a regression tree. Use the same variable as used in the simple model, logdislikes. Train a regression tree with cp = 0.05.
+```{r}
+yt_model_cart = rpart(logviews ~ logdislikes,yt_train, cp=0.05)
+```
+
+Looking at the plot of the tree, how many different predicted values are there?
+```{r}
+prp(yt_model_cart)
+```
+ 
+What is the R2 of this model on the test set?
+
+```{r}
+y_pred = predict(yt_model_cart,yt_test)
+y_true = yt_test$logviews
+rss = sum((y_pred - y_true) ^ 2)
+tss = sum((y_true - mean(y_true)) ^ 2)
+1 - rss/tss
+```
+
+
+ 
+The out-of-sample R2 does not appear to be very good under regression trees, compared to a linear regression model. We could potentially improve it via cross validation.
+
+Set seed to 100, run a 10-fold cross-validated cart model, with cp ranging from 0.0001 to 0.005 in increments of 0.0001. What is the optimal cp value on this grid?
+```{r}
+set.seed(100)
+numFolds = trainControl(method = "cv", number = 10 )
+cartGrid = expand.grid( .cp = seq(0.0001,0.005,0.0001))
+train(logviews ~ logdislikes, data = yt_train, method = "rpart", trControl = numFolds, tuneGrid = cartGrid )
+```
+
+
+What is the R2 of this new model on the test set?
+```{r}
+yt_model_cart_2 = rpart(logviews ~ logdislikes,yt_train, cp=0.0001)
+y_pred = predict(yt_model_cart_2,yt_test)
+y_true = yt_test$logviews
+rss = sum((y_pred - y_true) ^ 2)
+tss = sum((y_true - mean(y_true)) ^ 2)
+1 - rss/tss
+```
+
+Create a random forest model that predicts log(views) using the same variable as the CART model, with nodesize = 200 and ntree = 50. Set the random seed to 100.
+
+```{r}
+set.seed(100)
+yt_model_rf = randomForest(logviews ~ logdislikes, yt_train, nodesize=200,ntree=50)
+```
+
+What is the R2 of this new model on the test set?
+```{r}
+y_pred = predict(yt_model_rf,yt_test)
+y_true = yt_test$logviews
+rss = sum((y_pred - y_true) ^ 2)
+tss = sum((y_true - mean(y_true)) ^ 2)
+1 - rss/tss
+```
+
+

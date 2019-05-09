@@ -1,0 +1,301 @@
+---
+title: "Final Exam - Predicting Demand"
+author: "Vishal Gupta"
+date: "5/1/2019"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=9, fig.height=9,fig.align = "center")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE}
+library(dplyr)
+library(ROCR)
+library(tidyr)
+library(caTools)
+library(randomForest)
+library(rpart)
+library(rpart.plot)
+library(caret)
+library(e1071)
+```
+
+#### Problem 1 - Exploratory Data Analysis
+
+Which season has the most rentals?
+```{r}
+bikes = read.csv("~/Downloads/bikes.csv")
+bikes %>% group_by(season) %>% summarise(ct = sum(count)) %>% arrange(desc(ct))
+```
+
+- Summer
+- Fall
+- **Winter**
+- Spring
+
+What is the average temerature in Celsius?
+
+```{r}
+bikes %>% summarise(mean(temp))
+```
+
+
+What is the average temerature in Celsius during the high demand hours?
+
+High demand is defined by demand_level = 1.
+
+```{r}
+bikes %>% filter(demand_level == 1) %>% summarise(mean(temp))
+```
+
+ 
+#### Problem 2.1 - Preparing the Data
+
+We will now split the data into a training and testing set. To do this, we use the sample.split() function. Which variable will be used in this function?
+
+- temp
+- count
+- **demand_level**
+- season
+
+Set your random seed to 100 and create a training and test set using the sample.split() function in the caTools library, with 70% of the observations in the training set and 30% in the testing set.
+```{r}
+set.seed(100)
+spl = sample.split(bikes$demand_level,SplitRatio = 0.7)
+bikesTrain = bikes[spl==T,]
+bikesTest = bikes[spl==F,]
+```
+
+Why do we use the sample.split() function?
+
+- It is the most convenient way to randomly split the data
+- It balances the independent variables between the training and testing sets
+- **It balances the dependent variable between the training and testing sets**
+
+How many observation are there in the training set?
+
+```{r}
+nrow(bikesTrain)
+```
+
+
+#### Problem 2.2 - Simple Logistic Regression
+
+Train a logistic regression model using temp as the independent variable. What is the coefficient of temp?
+ 
+```{r}
+bikes_model = glm(formula = demand_level ~ temp, family = "binomial", data = bikesTrain)
+summary(bikes_model)
+```
+
+#### Problem 2.3 - Simple Logistic Regression
+
+Using your logistic regression model, obtain predictions on the test set. Then, using a probability threshold of 0.5, create a confusion matrix for the test set. What is the (test) accuracy of your logistic regression model?
+```{r}
+y_pred = (predict(bikes_model, bikesTest, ,type = 'response') >0.5)
+y_true = bikesTest$demand_level
+table(y_pred,y_true)
+sum(y_pred==y_true)/nrow(bikesTest)
+```
+
+ 
+Our baseline model in classification is to always predict the most frequent outcome in the test set. What is the (test) accuracy of this baseline model?
+
+```{r}
+sum(0==y_true)/nrow(bikesTest)
+```
+
+ 
+What is the true positive rate of your logistic regression model?
+
+```{r}
+true_inds = (y_true == 1)
+sum(y_pred[true_inds] == T)/sum(true_inds)
+```
+
+ 
+What is the false positive rate of your logistic regression model?
+
+```{r}
+false_inds = (y_true == 0)
+sum(y_pred[false_inds] == T)/sum(false_inds)
+```
+
+ 
+Currently, we are predicting many more low demand observations than high demand observations. Which of the following is a way to change that?
+
+
+- It is impossible to predict more high demand with this model. To change these results, another model can be used.
+- **To predict more high demand, decrease the prediction threshold.**
+- To predict more high demand hours, increase the prediction threshold.
+- To predict more high demand hours, create more observations with high demand.
+
+
+#### Problem 3.1 - Adding More Variables
+
+We would now like to train a logistic regression model using all of the variables in the training set. Which of the following is true?
+
+```{r}
+cor(bikesTrain)
+```
+
+
+- Weather and temp are highly correlated.
+- Season and weather are highly correlated.
+- **Workingday and holiday are not highly correlated.**
+- **Temp and atemp are highly correlated.**
+
+Train a logistic regression model now using all of the following variables in the training set:
+
+season, holiday, workingday, weather, temp, humidity, windspeed, and hour
+
+Which of the following variables are significant at a level of 0.001 or less?
+
+```{r}
+bikes_model2 = glm(demand_level ~ season + holiday + workingday + weather + temp + humidity + windspeed + hour, bikesTrain, family = 'binomial')
+summary(bikes_model2)
+```
+
+- **season**
+- holiday
+- workingday
+- weather
+- **temp**
+- **humidity**
+- windspeed
+- **hour**
+
+
+
+
+#### Problem 3.2 - Adding More Variables
+
+Using your new logistic regression model, obtain predictions on the test set. Then, using a probability threshold of 0.5, create a confusion matrix for the test set.
+
+```{r}
+y_pred = (predict(bikes_model2, bikesTest, ,type = 'response') >0.5)
+y_true = bikesTest$demand_level
+table(y_pred,y_true)
+```
+
+What is the (test) accuracy of your logistic regression model?
+
+```{r}
+sum(y_pred==y_true)/nrow(bikesTest)
+```
+
+
+ 
+Which of the following is true?
+
+- Close to a third of time that there is high demand, the model will predict high demand.
+- **Almost half of the times that there is high demand, the model will predict high demand.**
+- About 75% of the times that there is high demand, the model will predict high demand.
+- About 10% of the times that there is low demand, the model will predict high demand.
+- About 25% of the times that there is low demand, the model will predict high demand.
+- About 7% of the times that there is low demand, the model will predict high demand.
+
+Plot the ROC curve for your logistic regression model. Which logistic regression threshold is associated with the lower-left corner of the ROC plot (true positive rate 0 and false positive rate 0)?
+
+- 0
+- 0.5
+- **1**
+
+At roughly which logistic regression cutoff does the model achieve a true positive rate of 80% and a false positive rate of 40%?
+
+```{r}
+y_pred = predict(bikes_model2, bikesTest, ,type = 'response')
+ROCRpred = prediction(y_pred, y_true)
+ROCRperf = performance(ROCRpred, "tpr", "fpr")
+plot(ROCRperf, main="regression glm", colorize=TRUE, print.cutoffs.at=seq(0,1,by=0.1), text.adj=c(-0.2,1.7))
+```
+
+- 0.01
+- **0.19**
+- 0.37
+- 0.55
+- 0.73
+- 0.91
+
+What is the AUC for your logistic regression model?
+```{r}
+as.numeric(performance(ROCRpred, "auc")@y.values)
+```
+
+
+#### Problem 4.1 - CART
+
+Set the random seed to 100.
+
+Then use the caret package and the train function to perform 10-fold cross validation with the training data set to select the best cp value for a CART model that predicts the dependent variable demand_level using all of the possible independent variables except count which was used to define the dependent variable. Select the cp value from a grid consisting of the values 0.0001, 0.0002, 0.0003, ..., 0.02.
+
+```{r}
+set.seed(100)
+summary(bikesTrain)
+#bikesTrain$season = as.factor(bikesTrain$season)
+bikesTrain$holiday = as.factor(bikesTrain$holiday)
+bikesTrain$workingday = as.factor(bikesTrain$workingday)
+#bikesTrain$weather = as.factor(bikesTrain$weather)
+bikesTrain$demand_level = as.factor(bikesTrain$demand_level)
+
+numFolds = trainControl(method = "cv", number = 10)
+cartGrid = expand.grid( .cp = seq(0.0001,0.02,0.0001))
+train(demand_level ~ . - count - X, data = bikesTrain, method = "rpart", trControl = numFolds, tuneGrid = cartGrid)
+```
+
+Remember to convert the demand_level column to a factor variable.
+
+If you have called your training set train, use the following code:
+```
+train$demand_level = as.factor(train$demand_level)
+```
+Which cp value maximizes the cross-validation accuracy?
+
+**0.001**
+ 
+If you would like to view the tree, export it as a PDF from RStudio.
+
+What does the first split indicate? (2 points)
+
+```{r}
+bikes_model_CART = rpart(demand_level ~ . - count - X, bikesTrain, cp=0.001)
+prp(bikes_model_CART)
+```
+
+- There will be a high demand of bikes before 7 AM.
+- **There will not be a high demand of bikes before 7 AM.**
+- If the hour is before 7 AM, we should look at the temperature.
+- If the hour is before 7 AM and the temperature is less than 17, there will not be a high demand
+
+
+#### Problem 4.2 - CART
+
+What is the (test) accuracy of your CART model?
+
+```{r}
+
+bikesTest$holiday = as.factor(bikesTest$holiday)
+bikesTest$workingday = as.factor(bikesTest$workingday)
+#bikesTrain$weather = as.factor(bikesTrain$weather)
+bikesTest$demand_level = as.factor(bikesTest$demand_level)
+
+y_pred = predict(bikes_model_CART, bikesTest,type = 'class')
+y_true = bikesTest$demand_level
+sum(y_pred==y_true)/nrow(bikesTest)
+```
+
+ 
+What does the CART model predict on a Saturday, spring day at 9 AM when the temparature is 15 degrees Celsius?
+
+- high demand
+- **low demand**
+- Not enough information
+
+
+
+

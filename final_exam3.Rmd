@@ -1,0 +1,224 @@
+---
+title: "Understanding User Ratings"
+author: "Vishal Gupta"
+date: "5/6/2019"
+output: html_document
+---
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(fig.width=5, fig.height=3,fig.align = "center")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r results='hide', message=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(randomForest)
+library(rpart)
+library(rpart.plot)
+library(caret)
+library(e1071)
+```
+
+
+#### Problem 1 - Exploratory Data Analysis
+
+Read the dataset ratings.csv into a dataframe called ratings.
+
+How many users are in the dataset?
+
+```{r}
+ratings = read.csv("~/Downloads/ratings.csv")
+nrow(ratings)
+```
+
+ 
+How many categories are rated in the dataset?
+```{r}
+dim(ratings)[2]
+```
+
+ 
+Note that there are some NA's in the data. Which columns have missing data?
+
+```{r}
+summary(ratings)
+```
+
+- resorts
+- parks
+- museums
+- malls
+- restaurants
+- **burger_shops**
+- juice_bars
+- dance_clubs
+- bakeries
+- cafes
+- **gardens**
+
+What will happen if NA values are replaced with the value 0?
+
+- **Categories with missing values will be penalized.**
+- Categories with missing values will be rewarded.
+- The dataset and task will not be affected. This is the most fair way to handle the missing values.
+
+To deal with the missing values, we will simply remove the observations with the missing values first (there are more sophisticated ways to work with missing values, but for this purpose removing the observations is fine since we do not lose a significant amount of observations). Run the following code:
+```{r}
+ratings = ratings[rowSums(is.na(ratings)) == 0, ]
+```
+How many users are there now?
+
+```{r}
+nrow(ratings)
+```
+
+ 
+Which category has the highest mean score?
+
+- resorts
+- beaches
+- theatres
+- **malls**
+- juice_bars
+- drama
+- hotels
+- gyms
+
+#### Problem 2 - Preparing the Data
+
+Before performing clustering on the dataset, which variable(s) should be removed?
+
+- gyms
+- **userid**
+- burger_shops and gardens
+
+Remove the necessary column from the dataset and rename the new data frame points.
+
+```{r}
+points = ratings[2:24]
+```
+
+Now, we will normalize the data.
+
+What will the maximum value of pubs be after applying mean-var normalization? Answer without actually normalizing the data.
+
+- 5
+- **1**
+- Not enough information
+
+Normalize the data using the following code:
+```{r}
+library(caret)
+preproc = preProcess(points)
+pointsnorm = predict(preproc, points)
+```
+What is the maximum value of juice_bars after the normalization?
+
+```{r}
+summary(pointsnorm$juice_bars)
+```
+
+
+
+#### Problem 3.1 - Clustering
+Create a dendogram using the following code:
+```{r}
+distances = dist(pointsnorm, method = "euclidean")
+dend = hclust(distances, method = "ward.D")
+plot(dend, labels = FALSE)
+```
+Based on the dendrogram, how many clusters do you think would NOT be appropriate for this problem?
+
+- 2
+- 3
+- 4
+- **5**
+
+Based on this dendogram, in choosing the number of clusters, what is the best option?
+
+**4**
+ 
+#### Problem 3.2 - Clustering
+
+Set the random seed to 100, and run the k-means clustering algorithm on your normalized dataset, setting the number of clusters to 4.
+```{r}
+set.seed(100)
+```
+
+How many observations are in the largest cluster?
+
+```{r}
+userKmeans = kmeans(pointsnorm,4)
+max(table(as.factor(userKmeans$cluster)))
+```
+
+
+
+#### Problem 4 - Conceptual Questions
+
+True or False: If we ran k-means clustering a second time without making any additional calls to set.seed, we would expect every observation to be in the same cluster as it is now.
+
+- True
+- **False**
+
+True or False: K-means clustering is sensative to outliers.
+
+- **True**
+- False
+
+Why do we typically use cluster centroids to describe the clusters?
+
+
+- The cluster centroid gives the values of every single observation in the cluster, and therefore exactly describes the cluster.
+- **The cluster centroid captures the average behavior in the cluster, and can be used to summarize the general pattern in the cluster.**
+- The cluster centroid captures the average behavior in the cluster, relative to the other clusters. So by just computing a single cluster centroid, we can understand how the cluster differs from the other clusters.
+
+Is "overfitting" a problem in clustering?
+
+- No, we don't have test data, so it is impossible to evaluate k-means out-of-sample
+- **Yes, at the extreme every data point can be assigned to its own cluster.**
+- It depends on the application.
+
+Is "multicollinearity" a problem in clustering?
+
+- No, because we aren't trying to find coefficients in our model.
+- **Yes, multicollinearity could cause certain features to be overweighted in the distances calculations.**
+- It depends on the application.
+
+
+#### Problem 5 - Understanding the Clusters
+
+Which cluster has the user with the lowest average rating in restaurants?
+```{r}
+userKmeans$cluster[which.min(pointsnorm$restaurants)]
+```
+
+- Cluster 1
+- Cluster 2
+- Cluster 3
+- **Cluster 4**
+
+Which of the clusters is best described as "users who have mostly enjoyed churches, pools, gyms, bakeries, and cafes"?
+```{r}
+summary(userKmeans$centers)
+```
+
+- **Cluster 1**
+- Cluster 2
+- Cluster 3
+- Cluster 4
+
+Which cluster seems to enjoy being outside, but does not enjoy as much going to the zoo or pool?
+
+- Cluster 1
+- Cluster 2
+- Cluster 3
+- **Cluster 4**
+
+
+
+
