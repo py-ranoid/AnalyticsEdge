@@ -24,3 +24,7 @@
 |8|[ASG1 : Investment Management Under Taxation](http://vishalgupta.me/AnalyticsEdge/htmlNB/week8_assig1.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week8_assig1.Rmd)|
 |8|[ASG2 : Filatoi Riuniti](http://vishalgupta.me/AnalyticsEdge/htmlNB/week8_assig2.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week8_assig2.Rmd)|
 |8|[ASG3 : Gasoline Blending](http://vishalgupta.me/AnalyticsEdge/htmlNB/week8_assig3.html)|[Source](http://vishalgupta.me/AnalyticsEdge/week8_assig3.Rmd)|
+|🔥|[Final Exam 1 : Estimating Views](http://vishalgupta.me/AnalyticsEdge/htmlNB/final_exam1.html)|[Source](http://vishalgupta.me/AnalyticsEdge/final_exam1.Rmd)|
+|🔥|[Final Exam 2 : Predicting Demand](http://vishalgupta.me/AnalyticsEdge/htmlNB/final_exam2.html)|[Source](http://vishalgupta.me/AnalyticsEdge/final_exam2.Rmd)|
+|🔥|[Final Exam 3 : Understanding User Ratings](http://vishalgupta.me/AnalyticsEdge/htmlNB/final_exam3.html)|[Source](http://vishalgupta.me/AnalyticsEdge/final_exam3.Rmd)|
+|🔥|[Final Exam 4 : Optimizing Business Decisions](http://vishalgupta.me/AnalyticsEdge/htmlNB/final_exam4.html)|[Source](http://vishalgupta.me/AnalyticsEdge/final_exam4.Rmd)|
