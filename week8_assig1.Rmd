@@ -1,0 +1,121 @@
+---
+title: "Week 8 - Investment Management Under Taxation"
+author: "Vishal Gupta"
+date: "5/9/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Note : 
+
+- You can also solve optimisation problems in Week 8 using Google Sheets 
+- [Solver - Google Sheets Add-on](https://chrome.google.com/webstore/detail/solver/iennicjichkeiajiflbcmaaohildohpb?hl=en)
+- [Solution for this Assignment](https://docs.google.com/spreadsheets/d/1zoHZBGae52zZ_LsSdOYk7-UwfHKW2yy78e_UVWt_RY8/edit?usp=sharing)
+
+![](/Users/vishalgupta/Desktop/Screenshot 2019-05-09 at 8.32.10 AM.png)
+
+---
+
+#### Problem 1.1 - Formulating the Problem
+
+You would like to sell enough shares of stock today to generate $10,000 to use as part of a down payment on a new home. You need to decide how many shares of which stocks to sell in order to generate $10,000, after taxes and transaction costs, while maximizing the estimated value of your stock portfolio next year. Let's formulate this as a linear optimization problem.
+
+How many decision variables should your model have?
+
+**8**
+
+
+#### Problem 1.2 - Formulating the Problem
+
+We'll assume for this problem that you can't sell more shares of stock than you own, and you can't buy additional shares. What is the maximum value your decision variables can be?
+
+**150**
+
+What is the minimum value your decision variables can be?
+
+**0**
+
+
+#### Problem 1.3 - Formulating the Problem
+
+Your objective is to maximize the estimated value of your stock portfolio next year. To do this, you should sum the estimated value of each stock next year. Suppose you sell  shares of your stock in Microsoft. What is the estimated value of your Microsoft stock next year?
+
+- **$34.55 * (150 - x)**
+- $34.55 * x
+- $2.05 * (150 - x)
+- $2.05 * x
+
+#### Problem 1.4 - Formulating the Problem
+
+You need to make sure you get $10,000 in cash from selling your stocks, after taxes and transaction costs. How much would you get in cash, after taxes and transaction costs, if you sell 50 shares of your Intel stock?
+
+**1154.715**
+
+In LibreOffice (or in the spreadsheet software you are using), formulate and solve this optimization problem. Make sure to include a constraint for the amount of cash you generate, and upper and lower bounds for the values of your decision variables.
+
+#### Problem 2.1 - Analyzing the Solution
+
+In the optimal solution, which stocks do you sell at least one share of? Select all that apply.
+
+- **Yahoo!**
+- General Electric
+- **Microsoft**
+- Bank of America
+- JPMorgan Chase
+- Cisco Systems, Inc
+- **Intel**
+- Pfizer
+
+#### Problem 2.2 - Analyzing the Solution
+
+What is the objective value of the optimal solution (the estimated value of your portfolio of stocks next year)?
+
+**26773.66271**
+
+#### Problem 2.3 - Analyzing the Solution
+
+How many shares of stock in total should you sell to make sure you have enough cash, according to the optimal solution? (Assume that you can sell fractional shares.)
+
+**367.7232981**
+
+#### Problem 3.1 - Adjusting the Formulation
+
+As an invester, you like having a portfolio of eight different stocks because it diversifies your investment. If one or two stocks do poorly this year, you won't worry as much because you have many other stocks. In the optimal solution for this problem, you sold all of your shares of some stocks, but you would like to keep at least half of the shares of each of your stocks.
+
+Adjust the formulation so that you sell no more than 75 shares of each stock, and solve it again.
+
+In the optimal solution, you sell at least one share of which of your stocks? Select all that apply.
+
+- **Yahoo!**
+- **General Electric**
+- **Microsoft**
+- Bank of America
+- JPMorgan Chase
+- **Cisco Systems, Inc**
+- **Intel**
+- **Pfizer**
+
+#### Problem 3.2 - Adjusting the Formulation
+
+What is the objective value of the optimal solution now?
+
+**26468.54116**
+
+#### Problem 3.3 - Adjusting the Formulation
+
+Even though your investment is worth a bit less next year by diversifying, you expect this diversification to help you long term.
+
+However, you notice that you expect the Yahoo! stock to decrease in value next year. So, while you would like to sell no more than 75 shares of your other stocks, you would like to sell exactly 100 shares of your Yahoo! stock. Adjust your formulation in LibreOffice again, and re-solve to get the new optimal solution.
+
+You now sell at least one share of how many different stocks?
+
+**5**
+
+#### Problem 3.4 - Adjusting the Formulation
+
+What is your estimated portfolio value next year?
+
+**26507.52535**

@@ -1,0 +1,90 @@
+---
+title: "Week 8 - Lectures & Quick Questions"
+author: "Vishal Gupta"
+date: "5/9/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Airline Revenue Management: An Introduction to Linear Optimization  
+
+#### Video 4: Solving the Problem
+
+Note : 
+
+- You can also solve optimisation problems in Week 8 using Google Sheets 
+- [Solver - Google Sheets Add-on](https://chrome.google.com/webstore/detail/solver/iennicjichkeiajiflbcmaaohildohpb?hl=en)
+- [Solution for this Lecture](https://docs.google.com/spreadsheets/d/1IY97auB9n10ORk75u8yKLzSFr5-Aaq7FkgcDEatHMVg/edit?usp=sharing)
+
+![](/Users/vishalgupta/Desktop/Screenshot 2019-05-09 at 9.03.35 AM.png)
+
+---
+#### Quick Question
+
+In the previous video, we solved our optimization problem in LibreOffice. In your spreadsheet, change the demand for regular seats to 50 (cell D5). Then re-solve the model.
+
+What is the new optimal objective value?
+
+**58458**
+
+Now change the demand of regular seats to 200. What is the new optimal objective value?
+
+**102422**
+
+#### Quick Question
+
+Using the visualization we created in the previous video, answer the following questions:
+
+Suppose that our demand for regular seats remains the same (100) but our demand for discount seats goes down to 100. Will our optimal solution change?
+
+- Yes
+- **No* correct**
+- I can't answer this question using the visualization.
+
+Now suppose that our demand for regular seats remains the same (100) but our demand for discount seats goes down to 50. Will our optimal solution change?
+
+- **Yes**
+- No
+- I can't answer this question using the visualization.
+
+#### Quick Question
+
+In your spreadsheet, change the capacity to 250 in the capacity constraint, the regular demand to 150, and the discount demand to 150. Then re-solve the model.
+
+What is the objective value of the optimal solution?
+
+**116350**
+
+#### Video 7: Connecting Flights
+
+Note : 
+
+- You can also solve optimisation problems in Week 8 using Google Sheets 
+- [Solver - Google Sheets Add-on](https://chrome.google.com/webstore/detail/solver/iennicjichkeiajiflbcmaaohildohpb?hl=en)
+- [Solution for this Lecture](https://docs.google.com/spreadsheets/d/1fvizRwuZhqDRCcXkT_eJMqzv8xl3F2NgEesF6d0nNyw/edit?usp=sharing)
+
+![](/Users/vishalgupta/Desktop/Screenshot 2019-05-09 at 9.11.00 AM.png)
+
+#### Quick Question
+
+In this quick question, we'll perform some sensitivity analysis on the connecting flights problem.
+
+Previously, we said that American Airlines could market their fares to increase demand. It costs $200 in advertising to increase demand by one unit.
+
+Is it worth it to market the discount fares from JFK to DFW?
+
+
+- Yes. American Airlines should market the discount fares from JFK to DFW to increase demand by 50.
+- Yes. American Airlines should market the discount fares from JFK to DFW to increase demand by 10.
+- No. American Airlines should not market the discount fares from JFK to DFW because even though the revenue increases, it does not exceed the costs.
+- **No. American Airlines should not market the discount fares from JFK to DFW because the revenue does not increase at all by increasing the demand for these tickets.**
+
+Is it worth it to market the regular fares from JFK to LAX?
+
+- Yes. American Airlines should market the regular fares from JFK to LAX to increase demand by 50.
+- Yes. American Airlines should market the regular fares from JFK to LAX to increase demand by 10. incorrect
+- **No. American Airlines should not market the regular fares from JFK to LAX because even though the revenue increases, it does not exceed the costs.**
+- No. American Airlines should not market the regular fares from JFK to LAX because the revenue does not increase at all by increasing the demand for these tickets.

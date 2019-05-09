@@ -1,0 +1,130 @@
+---
+title: "Week 8 - Gasoline Blending"
+author: "Vishal Gupta"
+date: "5/9/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Note : 
+
+- You can also solve optimisation problems in Week 8 using Google Sheets 
+- [Solver - Google Sheets Add-on](https://chrome.google.com/webstore/detail/solver/iennicjichkeiajiflbcmaaohildohpb?hl=en)
+- [Solution for this Assignment](https://docs.google.com/spreadsheets/d/1eJ-6qHEFCZRrfElJXEreFRn998jnVbYR-EOHvBWpGHQ/edit?usp=sharing)
+
+![](/Users/vishalgupta/Desktop/Screenshot 2019-04-19 at 2.32.53 PM.png)
+
+---
+
+#### Problem 1.1 - The Formulation
+
+How many decision variables are there in this optimization model?
+
+**9**
+
+#### Problem 1.2 - The Formulation
+
+How many constraints are in the model, not including the non-negativity constraints?
+
+**10**
+
+#### Problem 2.1 - The Solution
+
+Solve your optimization model in LibreOffice (or in the spreadsheet software you are using). What is the objective value of the solution?
+
+**374989.1496**
+
+#### Problem 2.2 - The Solution
+
+In the optimal solution, we produce the MOST barrels of which gasoline?
+
+- Super gasoline
+- **Regular gasoline**
+- Diesel fuel
+
+#### Problem 2.3 - The Solution
+
+In the optimal solution, how many barrels of diesel fuel are produced?
+
+**0**
+  
+#### Problem 2.4 - The Solution
+
+The company is unhappy with this solution, because they are exceeding the customer demand for regular gasoline. They estimate that the customer demand for super gasoline is 3,000 barrels, the customer demand for regular gasoline is 2,000 barrels, and the customer demand for diesel fuel is 1,000 barrels. They don't want to produce more than the customer demand, since they will lose revenue. Add constraints to your model to make sure that the solution produces no more than the customer demand for each of the products, and re-solve your model.
+
+What is the objective value now?
+
+**150000**
+
+#### Problem 2.5 - The Solution
+
+Which of the crude oils are used in the solution? Select all that apply.
+
+
+- **Crude 1**
+- Crude 2
+- **Crude 3**
+
+
+#### Problem 3.1 - Sensitivity Analysis and Shadow Prices
+
+The following are the shadow prices for each of the demand constraints:
+
+Super gasoline demand shadow price = 29
+
+Regular gasoline demand shadow price = 27
+
+Diesel fuel demand shadow price = 9
+
+The super gasoline shadow price holds to an allowable increase of 1250, the regular gasoline shadow price holds to an allowable increase of 2500, and the diesel fuel shadow price holds to an allowable increase of 1250. The "allowable increase" is the amount that you can increase the right-hand side and still use this shadow price. For a larger increase, the shadow price will change, and you have to resolve the model to get the new shadow price.
+
+Please answer the following questions without re-solving the optimization model.
+
+What does a shadow price of 29 for the super gasoline demand constraint mean?
+
+
+- It is profitable to increase the super gasoline demand by 29 units, and then it is not profitable.
+- It is profitable to decrease the super gasoline demand by 29 units, and then it is not profitable.
+- For 10 additional barrels of demand of super gasoline, the total profit will decrease by 29.
+- For 10 additional barrels of demand of super gasoline, the total profit will increase by 29.
+- For one additional barrel of demand of super gasoline, the total profit will decrease by 29.
+- **For one additional barrel of demand of super gasoline, the total profit will increase by 29.**
+
+
+#### Problem 3.2 - Sensitivity Analysis and Shadow Prices
+
+According to the shadow prices, which type of gasoline should the company advertise to increase demand? Suppose that advertising costs $2 per unit increase in demand regardless of the type of gasoline being advertised. (Also suppose the company can only choose one type of gasoline to advertise.)
+
+
+- **Super Gasoline**
+- Regular Gasoline
+- Diesel Fuel
+- Can not be determined from the given information without re-solving the optimization model.
+
+#### Problem 3.3 - Sensitivity Analysis and Shadow Prices
+
+How much additional profit would you gain if the super gasoline demand increased by 500?
+
+(You can assume that the demand increased on its own and you didn't have to pay anything in advertising for this increase).
+
+- 1,250
+- 7,450
+- **14,500**
+- 43,500
+- Can not be determined from the given information without re-solving the optimization model.
+
+#### Problem 3.4 - Sensitivity Analysis and Shadow Prices
+
+How much additional profit would you gain if you increased the super gasoline demand by 1500?
+
+(You can assume that the demand increased on its own and you didn't have to pay anything in advertising for this increase).
+
+
+- 750
+- 3,450
+- 7,500
+- 43,500
+- **Can not be determined from the given information without re-solving the optimization model.**
