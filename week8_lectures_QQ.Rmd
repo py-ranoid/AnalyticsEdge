@@ -21,7 +21,6 @@ Note :
 
 ![](/Users/vishalgupta/Desktop/Screenshot 2019-05-09 at 9.03.35 AM.png)
 
----
 #### Quick Question
 
 In the previous video, we solved our optimization problem in LibreOffice. In your spreadsheet, change the demand for regular seats to 50 (cell D5). Then re-solve the model.
@@ -88,3 +87,48 @@ Is it worth it to market the regular fares from JFK to LAX?
 - Yes. American Airlines should market the regular fares from JFK to LAX to increase demand by 10. incorrect
 - **No. American Airlines should not market the regular fares from JFK to LAX because even though the revenue increases, it does not exceed the costs.**
 - No. American Airlines should not market the regular fares from JFK to LAX because the revenue does not increase at all by increasing the demand for these tickets.
+
+
+## Radiation Therapy: An Application of Linear Optimization
+
+#### Video 3: Solving the Problem
+Note : 
+
+- You can also solve optimisation problems in Week 8 using Google Sheets 
+- [Solver - Google Sheets Add-on](https://chrome.google.com/webstore/detail/solver/iennicjichkeiajiflbcmaaohildohpb?hl=en)
+- [Solution for this Lecture](https://docs.google.com/spreadsheets/d/1Y_q8YwXRrMbCDutvBFTYCCBtNoVXIazB9Q-R7Jrb6xY/edit?usp=sharing)
+
+![](/Users/vishalgupta/Desktop/Screenshot 2019-05-09 at 9.22.15 AM.png)
+
+#### Quick Question
+
+In our optimal solution, we are giving the maximum allowed dose to the spinal cord (5). If we were to relax this, how much could we decrease the objective? Change the right-hand-side (RHS) of the spinal cord constraint to 6, and re-solve the model. By how much did we decrease the objective? (Hint: the previous objective value was 22.75)
+
+**0.583333363**
+
+#### Quick Question
+
+In the previous video, we discussed a Head and Neck case with 132,878 voxels total, 9,777 voxels in the tumor, and 328 beamlets.
+
+How many decision variables does our optimization model have?
+
+**328**
+
+#### Quick Question
+
+In your spreadsheet from Video 3, make sure that you have solved the original small example problem (change the spinal cord limit back to 5 and re-solve if you have changed it, and make sure the objective value is 22.75).
+
+Now, change the weight for the spinal cord term in the objective to 5.
+
+Without re-solving, what does the objective value of the current solution change to?
+
+**42.75**
+
+Now re-solve the model. What does the objective change to?
+
+**25.66666667**
+ 
+Notice how we are now giving a smaller dose to the spinal cord!
+
+
+  
